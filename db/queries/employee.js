@@ -3,8 +3,6 @@ const db = require('../db.connection');
 
 // Get all employees
 function getAllEmployees () {
-
-
     const sql = `SELECT
 	employees.id,
     employees.first_name,
@@ -13,20 +11,14 @@ function getAllEmployees () {
     department.name AS department,
     role.salary,
     CONCAT(manager_table.first_name, ' ', manager_table.last_name) AS manager
-FROM
-	employees
-LEFT JOIN
-	role 
-ON
-	employees.role_id = role.id 
-LEFT JOIN
-	department 
-ON 
-	role.department_id = department.id 
-LEFT JOIN
-	employees manager_table
-ON 
-	manager_table.id = employees.manager_id;`;
+
+    FROM employees
+    LEFT JOIN role 
+    ON employees.role_id = role.id 
+    LEFT JOIN department 
+    ON role.department_id = department.id 
+    LEFT JOIN employees manager_table
+    ON manager_table.id = employees.manager_id;`;
 
     db.query(sql, (err, rows) => {
         if (err) {
@@ -37,15 +29,12 @@ ON
     });
 }
 
-// NEED: ids, first names, last names, job titles, departments, salaries, & managers
-// SELECT employee.*, first_name FROM employees INNERJOIN employees WHERE id = manager_id;
-
 // Add an employee
-function addEmployeeToDB (first, last, role, manager) {
-    const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id)
-    VALUES('${first}', '${last}', '${role}', '${manager}' )`
+function addEmployeeToDB ( id, first, last, role, manager) {
+    const sql = `INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
+    VALUES(?,?,?,?,?)`
 
-    db.query(sql, (err, result) => {
+    db.query(sql, [id, first, last, role, manager], (err, result) => {
         if (err) {
             console.log(err);
             return;

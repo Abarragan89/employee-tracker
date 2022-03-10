@@ -72,6 +72,11 @@ const addAEmployee = () => {
         },
         {
             type: 'input',
+            name: 'id',
+            message: 'What is the employee\'s ID?'
+        },
+        {
+            type: 'input',
             name: 'manager',
             message: 'What is the employee\'s manager?'
         }
@@ -96,7 +101,6 @@ promptUser()
             case 'View all departments':
                 getAllDepartments();
                 console.clear();
-                promptUser();
                 break;
             case 'View all roles':
                 getAllRoles();
@@ -121,11 +125,12 @@ promptUser()
             case 'Add an employee':
                 addAEmployee()
                     .then(response => {
+                        const id = response.id;
                         const first = response.first;
                         const last = response.last;
                         const role = response.role;
                         const manager = response.manager;
-                        addEmployeeToDB(first, last, role, manager)
+                        addEmployeeToDB(id, first, last, role, manager)
                     });
             case 'Update an employee role':
                 updateEmployee() 
