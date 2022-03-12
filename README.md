@@ -15,7 +15,7 @@
   npm install
   ```
   ## Usage
-  There is a seeds file that you may run in mysql2 that can populate the schema with dummy data. You can also create your own tables. Make sure you create your tables using a top down approach (i.e. first make your departments, then roles, then managers, then employees). [How To Video]()
+  There is a seeds file that you may run in mysql2 that can populate the schema with dummy data. You can also create your own tables. Make sure you create your tables using a top down approach (i.e. first make your departments, then roles, then managers, then employees). For every action you make, you must ctr-c and restart the app by typing node index. [How To Video](https://drive.google.com/file/d/1drNSIFCQHqGmW9bH2Np88536Ah3cRj-g/view)
   ## Contribution
   Fork and make a pull request
   ## Tests

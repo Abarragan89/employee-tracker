@@ -41,7 +41,6 @@ function getAllRolesUpdate () {
 }
 const formatRowRole = (row) => {
         const names = [];
-        console.log(row);
         row.forEach(item => {
             const role = 
             {

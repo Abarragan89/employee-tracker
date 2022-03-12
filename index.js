@@ -140,8 +140,6 @@ promptUser()
                     .then(response => {
                         const employee = response.employee;
                         const newRole = response.role;
-                        console.log('new role ' + newRole);
-                        console.log('employee ' + employee);
                         updateEmployeeRole(employee, newRole);
                     })
         }
