@@ -2,8 +2,7 @@
 const inquirer = require('inquirer');
 const { getAllDepartments, addDepartmentToDB } = require('./db/queries/department');
 const { getAllRoles, addRoleToDB } = require('./db/queries/role');
-const { getAllEmployees, addEmployeeToDB } = require('./db/queries/employee');
-
+const { getAllEmployees, addEmployeeToDB, getFirstLastEmployee, formatRow } = require('./db/queries/employee');
 
 // Inquirer Prompts
 const promptUser = () => {
@@ -72,11 +71,6 @@ const addAEmployee = () => {
         },
         {
             type: 'input',
-            name: 'id',
-            message: 'What is the employee\'s ID?'
-        },
-        {
-            type: 'input',
             name: 'manager',
             message: 'What is the employee\'s manager?'
         }
@@ -84,23 +78,23 @@ const addAEmployee = () => {
 };
 
 // Update and employee
-const updateEmployee = () => {
-    return inquirer.prompt([
+const updateEmployee = async () => {
+    const names = await getFirstLastEmployee().then(rows => formatRow(rows));
+    console.log("names in update" + ' ' + names);
+    return await inquirer.prompt([
         {
             type: 'list',
             name: 'employee',
-            choices: [getAllEmployees()]
+            choices: names
         }
     ])
 };
-
 
 promptUser()
     .then(results => {
         switch(results.navigator){
             case 'View all departments':
                 getAllDepartments();
-                console.clear();
                 break;
             case 'View all roles':
                 getAllRoles();
@@ -122,18 +116,21 @@ promptUser()
                         const department = response.department;
                         addRoleToDB (title, salary, department);
                     });
+                break;
             case 'Add an employee':
                 addAEmployee()
                     .then(response => {
-                        const id = response.id;
+                        console.log("response = ", response);
                         const first = response.first;
                         const last = response.last;
                         const role = response.role;
                         const manager = response.manager;
-                        addEmployeeToDB(id, first, last, role, manager)
+                        addEmployeeToDB(first, last, role, manager)
                     });
+                break;
             case 'Update an employee role':
                 updateEmployee() 
-                    .then(response => console.log(response.employee))
+                    // .then(response => console.log(response.employee))
+                    .then(response => console.log('finished'))
         }
     })

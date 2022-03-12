@@ -1,6 +1,51 @@
 'use strict';
 const db = require('../db.connection');
 
+// function getFirstLastEmployee () {
+//         const sql = `SELECT first_name, last_name FROM employees`
+//         db.query(sql, (err, rows) => {
+//             if (err) {
+//                 return(err);
+//             }
+//                 rows.forEach(item => {
+//                     names.push(item.first_name + ' ' + item.last_name);
+//             })
+//             console.log('in db query ' + names);
+//             return names;
+//         })
+// }
+
+function getFirstLastEmployee () {
+    return new Promise ((resolve, reject) => {
+        const sql = `SELECT first_name, last_name FROM employees`
+        db.query(sql, (err, rows) => {
+            if (err) {
+                return(err);
+            }
+            console.log('in db query ' + rows);
+            resolve(rows);
+        })
+    })
+}
+const formatRow = (row) => {
+        const names = [];
+        row.forEach(item => {
+            names.push(item.first_name + ' ' + item.last_name);
+        })
+        console.log('In formatRow ' + names)
+        return names
+}
+
+// const name = getFirstLastEmployee().then(rows => formatRow(rows));
+// console.log('outside function ' + name);
+// const practiceFunction = () => {
+//     let array = [];
+//     array.push("square");
+//     return array;
+// }
+// const practice = practiceFunction()
+// console.log('practice' + ' ' + practice)
+
 // Get all employees
 function getAllEmployees () {
     const sql = `SELECT
@@ -30,11 +75,15 @@ function getAllEmployees () {
 }
 
 // Add an employee
-function addEmployeeToDB ( id, first, last, role, manager) {
-    const sql = `INSERT INTO employees (id, first_name, last_name, role_id, manager_id)
-    VALUES(?,?,?,?,?)`
+function addEmployeeToDB (first, last, role, manager) {
+    // 3/9/2022 MORNING START
+    const sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id)
+    SELECT ?, ?, role.id, m.id
+    FROM role, employees m  
+    WHERE role.title = ?
+    AND m.first_name = ?`;
 
-    db.query(sql, [id, first, last, role, manager], (err, result) => {
+    db.query(sql, [first, last, role, manager], (err, result) => {
         if (err) {
             console.log(err);
             return;
@@ -45,10 +94,10 @@ function addEmployeeToDB ( id, first, last, role, manager) {
 
 function updateEmployeeToDB (first, last, role) {
     const sql = `UPDATE employees
-                SET role = ('${role}')
-                WHERE first_name = ${first} AND
-                    last_name = ${last}`;
-    db.query(sql, (err, result) => {
+                SET role = (?)
+                WHERE first_name = ? AND
+                    last_name = ?`;
+    db.query(sql, [first, last, role], (err, result) => {
         if (err) {
             console.log(err);
             return;
@@ -58,7 +107,11 @@ function updateEmployeeToDB (first, last, role) {
 
 }
 
+
+
 module.exports = { getAllEmployees,
                     addEmployeeToDB,
-                    updateEmployeeToDB
+                    updateEmployeeToDB,
+                    getFirstLastEmployee,
+                    formatRow
                 }
