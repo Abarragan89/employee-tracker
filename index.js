@@ -1,8 +1,8 @@
 'use strict';
 const inquirer = require('inquirer');
 const { getAllDepartments, addDepartmentToDB } = require('./db/queries/department');
-const { getAllRoles, addRoleToDB } = require('./db/queries/role');
-const { getAllEmployees, addEmployeeToDB, getFirstLastEmployee, formatRow } = require('./db/queries/employee');
+const { getAllRoles, addRoleToDB, formatRowRole, getAllRolesUpdate  } = require('./db/queries/role');
+const { getAllEmployees, addEmployeeToDB, getFirstLastEmployee, formatRow, updateEmployeeRole } = require('./db/queries/employee');
 
 // Inquirer Prompts
 const promptUser = () => {
@@ -17,7 +17,7 @@ const promptUser = () => {
                 'View all employees',
                 'Add a department', 
                 'Add a role',
-                'Add an employee', 
+                'Add an employee',
                 'Update an employee role'
             ]
         },
@@ -48,7 +48,7 @@ const addARole = () => {
         {
             type: 'input',
             name: 'department',
-            message: 'Which department ID does the role belong to?'
+            message: 'Which department does the role belong to?'
         }
     ])
 };
@@ -63,7 +63,7 @@ const addAEmployee = () => {
             type: 'input',
             name: 'last',
             message: 'What is the employee\'s last name?'
-        },
+        },        
         {
             type: 'input',
             name: 'role',
@@ -72,7 +72,7 @@ const addAEmployee = () => {
         {
             type: 'input',
             name: 'manager',
-            message: 'What is the employee\'s manager?'
+            message: 'What is the employee\'s manager?(leave blank for no manager)'
         }
     ])
 };
@@ -80,12 +80,18 @@ const addAEmployee = () => {
 // Update and employee
 const updateEmployee = async () => {
     const names = await getFirstLastEmployee().then(rows => formatRow(rows));
-    console.log("names in update" + ' ' + names);
+    const roles = await getAllRolesUpdate().then(rows => formatRowRole(rows));
+
     return await inquirer.prompt([
         {
             type: 'list',
             name: 'employee',
             choices: names
+        },
+        {
+            type: 'list', 
+            name: 'role',
+            choices: roles
         }
     ])
 };
@@ -106,7 +112,7 @@ promptUser()
                 addADepartment()
                     .then(response => {
                         addDepartmentToDB(response.type);
-                    })
+                    }); 
                 break;
             case 'Add a role':
                 addARole()
@@ -120,17 +126,23 @@ promptUser()
             case 'Add an employee':
                 addAEmployee()
                     .then(response => {
-                        console.log("response = ", response);
                         const first = response.first;
                         const last = response.last;
                         const role = response.role;
-                        const manager = response.manager;
-                        addEmployeeToDB(first, last, role, manager)
+                        const managerNames = response.manager.split(" ");
+                        const managerFirst = managerNames[0];
+                        const managerSecond = managerNames[1];
+                        addEmployeeToDB(first, last, role, managerFirst, managerSecond);
                     });
                 break;
             case 'Update an employee role':
                 updateEmployee() 
-                    // .then(response => console.log(response.employee))
-                    .then(response => console.log('finished'))
+                    .then(response => {
+                        const employee = response.employee;
+                        const newRole = response.role;
+                        console.log('new role ' + newRole);
+                        console.log('employee ' + employee);
+                        updateEmployeeRole(employee, newRole);
+                    })
         }
     })

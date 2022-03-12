@@ -12,6 +12,7 @@ function getAllRoles () {
         console.table(rows);
     });
 }
+
 // Add a role
 function addRoleToDB (title, salary, department) {
     const sql = `INSERT INTO role(title, salary, department_id)
@@ -25,6 +26,35 @@ function addRoleToDB (title, salary, department) {
     });
 }
 
+
+// Show all roles for update process
+function getAllRolesUpdate () {
+    return new Promise ((resolve, reject) => {
+        const sql = `SELECT * FROM role`
+        db.query(sql, (err, rows) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(rows);
+        })
+    })
+}
+const formatRowRole = (row) => {
+        const names = [];
+        console.log(row);
+        row.forEach(item => {
+            const role = 
+            {
+                name: item.title,
+                value: item.id
+            }
+            names.push(role);
+        })
+        return names
+}
+
 module.exports = {  getAllRoles,
-                    addRoleToDB
+                    addRoleToDB,
+                    formatRowRole,
+                    getAllRolesUpdate
                 };
